@@ -1,0 +1,15 @@
+name: hermes-bill
+version: 0.1.0
+manifest_version: 2
+description: Remote-first bill management tools, skill, API, and Hermes Desktop dashboard.
+author: liujinglun
+license: MIT
+tags:
+  - finance
+  - bills
+  - desktop
+provides_tools:
+  - bill_add_record
+  - bill_import_records
+  - bill_update_record
+
