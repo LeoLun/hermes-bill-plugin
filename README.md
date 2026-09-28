@@ -1,6 +1,6 @@
 # Hermes Bill
 
-Hermes Bill 是一个远程优先的 Hermes Agent + Desktop 统一插件。账单解析、校验、SQLite 持久化和统计全部运行在远程 `hermes serve` 主机；Desktop 只通过当前网关的插件作用域 API 渲染原生账单 Tab。
+Hermes Bill 是一个远程优先的 Hermes Agent + Desktop 统一插件。账单解析、校验、SQLite 持久化和统计全部运行在远程 `hermes serve` 主机；Desktop 只通过当前网关的插件作用域 API 渲染原生账单页面。
 
 ## 架构
 
@@ -18,7 +18,7 @@ desktop/plugin.js  ── ctx.rest ─────▶ dashboard/plugin_api.py
 - `bill_add_record`、`bill_import_records`、`bill_update_record` 三个 Agent 工具。
 - `hermes-bill:bill-manager` 解析与分类 skill。
 - 只读 `/api/plugins/hermes-bill/overview` API。
-- Hermes Desktop 主工作区“账单”Tab，包含年度/月度筛选、摘要、图表和最近交易。
+- Hermes Desktop 左侧导航栏“账单”入口，在中央区域展示年度/月度筛选、摘要、图表和最近交易。
 
 ## 安装
 
@@ -37,9 +37,7 @@ hermes plugins enable hermes-bill
 
 ### 2. Hermes Desktop 本机
 
-在 Capabilities → Plugins 中选择 **Install from Git**，填入同一个仓库 URL，并勾选 Desktop 目标。安装后打开 Desktop 开关；插件会打开“账单”主工作区 Tab。关闭 Tab 后可使用命令面板中的“打开账单”重新打开。
-
-当前 Desktop 不支持 `host.openWorkspace()` 时，插件会回退为主区域 pane。
+在 Capabilities → Plugins 中选择 **Install from Git**，填入同一个仓库 URL，并勾选 Desktop 目标。安装后打开 Desktop 开关；左侧导航栏会出现“账单”入口。也可使用命令面板中的“打开账单”进入账单页面。
 
 ## 使用
 
@@ -51,7 +49,7 @@ hermes plugins enable hermes-bill
 
 复杂流水先要求 dry-run，核对结果后再正式导入。面板只读，不支持新增、删除、编辑或上传。
 
-首次验证建议新增一条虚构记录，然后在账单 Tab 点击“刷新”。新账本默认为空；本项目不会读取或迁移其他账本。
+首次验证建议新增一条虚构记录，然后在左侧导航栏打开“账单”并点击“刷新”。新账本默认为空；本项目不会读取或迁移其他账本。
 
 ## 数据与备份
 
@@ -89,4 +87,3 @@ node --check desktop/plugin.js
 ```
 
 测试通过 `HERMES_BILL_DATA_DIR` 使用临时目录，所有记录均为虚构数据。
-
