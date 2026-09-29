@@ -17,32 +17,24 @@ def _tool_error(error: Exception) -> str:
     return _result({"ok": False, "error": str(error), "error_type": type(error).__name__})
 
 
-def _add_record(args: dict[str, Any], **_: Any) -> str:
+def _manage_bill(args: dict[str, Any], **_: Any) -> str:
     try:
         store = BillStore()
-        return _result(store.add_record(args["record"], dry_run=bool(args.get("dry_run", False))))
-    except Exception as error:  # Hermes tool handlers must return errors, never raise.
-        return _tool_error(error)
-
-
-def _import_records(args: dict[str, Any], **_: Any) -> str:
-    try:
-        store = BillStore()
-        return _result(store.import_records(args["records"], dry_run=bool(args.get("dry_run", False))))
-    except Exception as error:  # Hermes tool handlers must return errors, never raise.
-        return _tool_error(error)
-
-
-def _update_record(args: dict[str, Any], **_: Any) -> str:
-    try:
-        store = BillStore()
-        return _result(
-            store.update_record(
-                args["transaction_id"],
-                args["updates"],
-                dry_run=bool(args.get("dry_run", False)),
+        action = args["action"]
+        dry_run = bool(args.get("dry_run", False))
+        if action == "add":
+            return _result(store.add_record(args["record"], dry_run=dry_run))
+        if action == "import":
+            return _result(store.import_records(args["records"], dry_run=dry_run))
+        if action == "update":
+            return _result(
+                store.update_record(
+                    args["transaction_id"],
+                    args["updates"],
+                    dry_run=dry_run,
+                )
             )
-        )
+        raise ValueError(f"不支持的 action: {action}")
     except Exception as error:  # Hermes tool handlers must return errors, never raise.
         return _tool_error(error)
 
@@ -68,68 +60,33 @@ def register(ctx: Any) -> None:
     ctx.register_skill("bill-manager", skill_path)
 
     ctx.register_tool(
-        name="bill_add_record",
+        name="bill_manage",
         toolset="hermes_bill",
-        handler=_add_record,
-        description="新增一条远程账单记录。",
+        handler=_manage_bill,
+        description="新增、批量导入或更新远程账单。",
         schema={
-            "name": "bill_add_record",
-            "description": "新增一条账单。调用前应加载 hermes-bill:bill-manager skill，先完成字段解析和分类。",
+            "name": "bill_manage",
+            "description": "管理账单。调用前应加载 hermes-bill:bill-manager skill。",
             "parameters": {
                 "type": "object",
                 "properties": {
+                    "action": {"type": "string", "enum": ["add", "import", "update"]},
                     "record": {
                         "type": "object",
                         "properties": RECORD_PROPERTIES,
                         "required": ["transactionTime", "counterparty", "category", "amount"],
                     },
-                    "dry_run": {"type": "boolean", "default": False},
-                },
-                "required": ["record"],
-            },
-        },
-        emoji="🧾",
-    )
-    ctx.register_tool(
-        name="bill_import_records",
-        toolset="hermes_bill",
-        handler=_import_records,
-        description="原子批量导入远程账单记录。",
-        schema={
-            "name": "bill_import_records",
-            "description": "原子批量导入账单。调用前应加载 hermes-bill:bill-manager skill；任一记录无效时整批失败。",
-            "parameters": {
-                "type": "object",
-                "properties": {
                     "records": {
                         "type": "array",
                         "minItems": 1,
                         "items": {"type": "object", "properties": RECORD_PROPERTIES},
                     },
-                    "dry_run": {"type": "boolean", "default": False},
-                },
-                "required": ["records"],
-            },
-        },
-        emoji="📥",
-    )
-    ctx.register_tool(
-        name="bill_update_record",
-        toolset="hermes_bill",
-        handler=_update_record,
-        description="按交易单号更新远程账单。",
-        schema={
-            "name": "bill_update_record",
-            "description": "按交易单号更新账单字段。不会更改交易单号。",
-            "parameters": {
-                "type": "object",
-                "properties": {
                     "transaction_id": {"type": "string"},
                     "updates": {"type": "object", "properties": RECORD_PROPERTIES},
                     "dry_run": {"type": "boolean", "default": False},
                 },
-                "required": ["transaction_id", "updates"],
+                "required": ["action"],
             },
         },
-        emoji="✏️",
+        emoji="🧾",
     )

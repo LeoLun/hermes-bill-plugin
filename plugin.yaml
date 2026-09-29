@@ -9,7 +9,4 @@ tags:
   - bills
   - desktop
 provides_tools:
-  - bill_add_record
-  - bill_import_records
-  - bill_update_record
-
+  - bill_manage

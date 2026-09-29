@@ -15,7 +15,7 @@ desktop/plugin.js  ── ctx.rest ─────▶ dashboard/plugin_api.py
 
 插件提供：
 
-- `bill_add_record`、`bill_import_records`、`bill_update_record` 三个 Agent 工具。
+- `bill_manage` Agent 工具，通过 `add`、`import`、`update` 三种 action 管理账单。
 - `hermes-bill:bill-manager` 解析与分类 skill。
 - 只读 `/api/plugins/hermes-bill/overview` API。
 - Hermes Desktop 左侧导航栏“账单”入口，在中央区域展示年度/月度筛选、摘要、图表和最近交易。
